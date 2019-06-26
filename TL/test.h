@@ -7,6 +7,6 @@
 #include "model.h"
 
 void AgentBehaviour(const int &C_num);
-void ReplicaBehaviour(const int &C_num, double modelValue[16]);
+void ReplicaBehaviour(const int &C_num);
 
 #endif

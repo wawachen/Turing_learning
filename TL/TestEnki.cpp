@@ -57,44 +57,19 @@ void Agent::controlStep(double dt)
 ************/
   EPuck::controlStep(dt);
 }
+
 //Replica
-userSensor::userSensor(Robot *owner, Vector pos, double height, double orientation, double range, double m, double x0, double c, double noiseSd):
-IRSensor(owner, pos, height, orientation, range, m, x0, c, noiseSd){}
+Agent1::Agent1(): EPuck(CAPABILITY_BASIC_SENSORS){}
 
-userSensor::~userSensor() 
+Agent1::~Agent1() 
 {
-  //std::cout<< "sensors deleted"<<std::endl;
+  //std::cout<< "agent deleted"<<std::endl;
 }
 
-Replica::Replica(double modelValue[16]):
-DifferentialWheeled(5.1, 12.8, 0.05)
+void Agent1::controlStep(double dt)
 {
-  for (unsigned i = 0; i < 8; i++)
-  {
-    theta[i] = modelValue[i];
-    radius[i] = modelValue[i+8];
-  }
-  setCylindric(robot_radius, 4.7, 152);
-  setColor(Color::red);
-
-  //std::vector<userSensor *>userSensors;
-  for (unsigned j = 0; j < 8; j++)
-  {
-    userSensors.push_back(new userSensor(this, Vector(radius[j]*cos(theta[j]), radius[j]*sin(theta[j])), 2.5, theta[j], 12, 3731, 0.3, 0.7, 10));
-    addLocalInteraction(userSensors[j]);
-  }
-}
-
-Replica::~Replica() 
-{
-  //std::cout<< "replica deleted"<<std::endl;
-  for (unsigned i = 0; i< 8; i++)
-    delete userSensors[i];
-}
-
-void Replica::controlStep(double dt)
-{
- /******Obstacle Avoidance******
+/********
+  #define deg2rad(x) ((x)*M_PI/180.)
   double S[8];
   double S_x = 0.0, S_y = 0.0;
   double alpha;
@@ -102,20 +77,21 @@ void Replica::controlStep(double dt)
 
   double maxvalue = 3000.0;
   double defaultSpeed = 0.8*maxSpeed;
-  
-  S[0] = min(1.0, userSensors[0]->getValue() / maxvalue);
-  S[1] = min(1.0, userSensors[1]->getValue() / maxvalue);
-  S[2] = min(1.0, userSensors[2]->getValue() / maxvalue);
-  S[3] = min(1.0, userSensors[3]->getValue() / maxvalue);
-  S[4] = min(1.0, userSensors[4]->getValue() / maxvalue);
-  S[5] = min(1.0, userSensors[5]->getValue() / maxvalue);
-  S[6] = min(1.0, userSensors[6]->getValue() / maxvalue);
-  S[7] = min(1.0, userSensors[7]->getValue() / maxvalue);
+  double agent_theta[8] = {deg2rad(-18), deg2rad(-45), deg2rad(-90), deg2rad(-142), deg2rad(142), deg2rad(90), deg2rad(45), deg2rad(18)};
 
+  S[0] = min(1.0, infraredSensor0.getValue() / maxvalue);
+  S[1] = min(1.0, infraredSensor1.getValue() / maxvalue);
+  S[2] = min(1.0, infraredSensor2.getValue() / maxvalue);
+  S[3] = min(1.0, infraredSensor3.getValue() / maxvalue);
+  S[4] = min(1.0, infraredSensor4.getValue() / maxvalue);
+  S[5] = min(1.0, infraredSensor5.getValue() / maxvalue);
+  S[6] = min(1.0, infraredSensor6.getValue() / maxvalue);
+  S[7] = min(1.0, infraredSensor7.getValue() / maxvalue);
+  std::cout<<S[0]<<" "<<S[1]<<" "<<S[2]<<" "<<S[3]<<" "<<S[4]<<" "<<S[5]<<" "<<S[6]<<" "<<S[7]<<std::endl;
   for (unsigned i = 0; i < 8; i++)
   {
-    S_x += S[i] * cos(theta[i]);
-    S_y += S[i] * sin(theta[i]);
+    S_x += S[i] * cos(agent_theta[i]);
+    S_y += S[i] * sin(agent_theta[i]);
   }
   if (S_x > 0)
     alpha = min(1.0, sqrt(pow(S_x,2.0) + pow(S_y,2.0)));
@@ -125,50 +101,20 @@ void Replica::controlStep(double dt)
 
   leftSpeed = (1 - alpha) *  defaultSpeed + d * alpha * maxSpeed;
   rightSpeed = (1 - alpha) *  defaultSpeed - d * alpha * maxSpeed;
-*******************************/
-  DifferentialWheeled::controlStep(dt); //interlacedDistance = 0.
-}
-//Object
-Object::Object(): PhysicalObject()
-{
-setCylindric(robot_radius/2.0, 10.0, 152);
-setColor(Color::blue);
+************/
+  EPuck::controlStep(dt);
 }
 
-Object::~Object() {}
+
 //World
 TestWorld::TestWorld(double width, double height): Enki::World(width, height)
 {
-  for (unsigned i = 0; i < c_object; i++)
-      creatObject(i);
+  
 }
 
 TestWorld::~TestWorld() 
 {
    //std::cout<< "world deleted"<<std::endl;
-}
-
-void TestWorld::creatObject(unsigned position)
-{
-  Object* o = new Object();
-  if (position == 0)
-    {o->pos = Enki::Point(world_width/4, world_height/4);addObject(o);}
-  if (position == 1)
-    {o->pos = Enki::Point(world_width/4, world_height/2);addObject(o);}
-  if (position == 2)
-    {o->pos = Enki::Point(world_width/4, 3*world_height/4);addObject(o);}
-  if (position == 3)
-    {o->pos = Enki::Point(world_width/2, world_height/4);addObject(o);}
-  if (position == 4)
-    {o->pos = Enki::Point(world_width/2, world_height/2);addObject(o);}
-  if (position == 5)
-    {o->pos = Enki::Point(world_width/2, 3*world_height/4);addObject(o);}
-  if (position == 6)
-    {o->pos = Enki::Point(3*world_width/4, world_height/4);addObject(o);}
-  if (position == 7)
-    {o->pos = Enki::Point(3*world_width/4, world_height/2);addObject(o);}
-  if (position == 8)
-    {o->pos = Enki::Point(3*world_width/4, 3*world_height/4);addObject(o);}
 }
 
 void TestWorld::creatAgent(Agent* a)
@@ -210,7 +156,7 @@ void TestWorld::creatAgent(Agent* a)
   addObject(a);
 }
 
-void TestWorld::creatReplica(Replica* r)
+void TestWorld::creatReplica(Agent1* r)
 {
   //Replica* r = new Replica(modelValue);
   Enki::Point new_pos;
@@ -225,7 +171,7 @@ void TestWorld::creatReplica(Replica* r)
     );
     for (Enki::World::ObjectsIterator i=objects.begin();i != objects.end();++i)
     {
-      Replica* r_other = dynamic_cast<Replica*>(*i);
+      Agent1* r_other = dynamic_cast<Agent1*>(*i);
       if (r_other)
       {
         if ((r_other->pos - new_pos).norm2() < 4. * robot_radius ^ 2)
