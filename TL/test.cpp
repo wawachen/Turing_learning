@@ -4,6 +4,38 @@ int maxSteps = 100;
 double maxSpeed = 12.8;
 double maxvalue = 3000.0;
 
+
+
+double f(double x,double x1,double y1,double k)
+{
+  return k*(x-x1)+y1;
+}
+
+double g(double y,double x1,double y1,double k)
+{
+  return x1+(y-y1)/k;
+} 
+
+//calculate the real distance from replica to the wall
+unsigned int replica_cal_distance(Agent1* r)
+{
+  double x1 = r->pos->x;
+  double y1 = r->pos->y;
+  double k = tan(r->angle);
+
+
+  //if parallel
+
+  //if not parallel
+   
+
+}
+//simlate the sensor readings of tof sensor on the agent 
+unsigned int agent_get_reading(Agent* a)
+{
+
+}
+
 void AgentBehaviour(const int &C_num)
 {
   Agent* a = new Agent();
