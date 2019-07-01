@@ -137,14 +137,15 @@ void AgentBehaviour(const int &C_num)
   for (int Step = 0; Step < maxSteps; Step++)
   {
     world.run();
-    CF_input = agent_get_reading(Agent* a);
+    CF_input[0] = agent_get_reading(a);
+    CF_input[1] = 1.0;
     CF_elmanNetwork(CF_input, C_num);
     a->leftSpeed = 2 * maxSpeed * CF_output[1] - maxSpeed;
     a->rightSpeed = 2 * maxSpeed * CF_output[2] - maxSpeed;
   }
 }
 
-void ReplicaBehaviour(const int &C_num)
+void ReplicaBehaviour(const int &C_num, double modelValue[2])
 {
   Agent1* r = new Agent1();
   TestWorld world(50, 50);
@@ -153,7 +154,8 @@ void ReplicaBehaviour(const int &C_num)
   for (int Step = 0; Step < maxSteps; Step++)
   {
     world.run();
-    CF_input = k*replica_cal_distance(Agent1* r)+b;
+    CF_input[0] = modelValue[0]*replica_cal_distance(r)+modelValue[1];
+    CF_input[1] = 1.0;
     CF_elmanNetwork(CF_input, C_num);
     r->leftSpeed = 2 * maxSpeed * CF_output[1] - maxSpeed;
     r->rightSpeed = 2 * maxSpeed * CF_output[2] - maxSpeed;

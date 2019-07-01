@@ -59,7 +59,10 @@ void Agent::controlStep(double dt)
 }
 
 //Replica
-Agent1::Agent1(): EPuck(CAPABILITY_BASIC_SENSORS){}
+Agent1::Agent1(): EPuck(CAPABILITY_BASIC_SENSORS)
+{
+
+}
 
 Agent1::~Agent1() 
 {
