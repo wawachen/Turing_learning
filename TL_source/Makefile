@@ -8,8 +8,8 @@ HEADERS = TestEnki.h model.h classifier.h parameters.h test.h
 ODIR = obj
 _OBJ = test.o TestEnki.o model.o classifier.o main.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
-IDIR = -I. -I/usr/include -I/home/miro/Turing_learning/enki
-LDIR = -L. -L/home/miro/Turing_learning/enki/enki -L/usr/lib -L/home/miro/Turing_learning/enki/viewer -lm -lenkiviewer -lQtOpenGL -lQtGui -lQtCore -lglut -lGLU -lGL -lenki -lgsl -lgslcblas
+IDIR = -I. -I/usr/include -I/home/cov16yg/enki-master
+LDIR = -L. -L/home/cov16yg/enki-master/enki -L/usr/lib -L/home/cov16yg/enki-master/viewer -lm -lenkiviewer -lQtOpenGL -lQtGui -lQtCore -lglut -lGLU -lGL -lenki -lgsl -lgslcblas
 OUT = main
 
 all: $(OUT)

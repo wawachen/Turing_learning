@@ -37,8 +37,8 @@ int main(int argc, char *argv[])
 
     for (M_num=0; M_num < MODEL_POPSIZE; M_num++)
     {
-      double modelValue[2]; // k and b for y = k*x+b
-      for (unsigned i = 0; i < 2; i++)
+      double modelValue[16];
+      for (unsigned i = 0; i < 16; i++)
       {modelValue[i] = model[M_num].chrom[i];}
       
       for(C_num = 0; C_num < CLASSIFIER_POPSIZE; C_num++)

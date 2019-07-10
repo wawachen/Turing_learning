@@ -24,12 +24,34 @@ public:
 };
 
 //Replica
-class Agent1: public EPuck
+class userSensor;
+
+class Replica: public DifferentialWheeled
+{
+private:
+       friend class userSensor;
+public:
+       std::vector<userSensor *>userSensors;
+       double theta[8];
+       double radius[8];
+       Replica(double modelValue[16]);
+       ~Replica();
+       virtual void controlStep(double dt);
+};
+
+class userSensor: public IRSensor
 {
 public:
-       Agent1();
-       ~Agent1();
-       virtual void controlStep(double dt);
+        userSensor(Robot *owner, Vector pos, double height, double orientation, double range, double m, double x0, double c, double noiseSd);
+        ~userSensor();
+};
+
+//Object
+class Object: public PhysicalObject
+{
+public:
+       Object();
+       ~Object();
 };
 
 //World
@@ -38,8 +60,9 @@ class TestWorld: public Enki::World
 public:
        TestWorld(double width, double height);
        ~TestWorld();
+       void creatObject(unsigned position);
        void creatAgent(Agent* a);
-       void creatReplica(Agent1* r);
+       void creatReplica(Replica* r);
        void run();
 };
 #ifdef ViewerMode
