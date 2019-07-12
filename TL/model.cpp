@@ -138,27 +138,32 @@ void output_best_model(const int &generation, char *argv[]) //model[0]
 {
   stringstream modelGenes, modelFitness;
 
-  modelGenes<< "./data/model/" << argv[1] << "_genes_" << generation << ".txt";
-  outData.open(modelGenes.str().c_str(), std::ios::trunc);  
+  modelGenes<< "./data/model/" << argv[1] << "_genes_" << ".txt";
+  outData.open(modelGenes.str().c_str(), std::ios::out|std::ios::app);  
   if (!outData)
   {
     cout << "Error: Can't open the model gene file.\n";
     exit(1);
   }  
+  outData << generation<<": ";
   for(unsigned i = 0; i < MODEL_GENESIZE/2; i++)
   {
     //outData << model[0].chrom[i] << " " << model[0].chrom[i + MODEL_GENESIZE/2] << " ";
+    if(i== (MODEL_GENESIZE/2-1)){
+      outData << model[0].chrom[i] << std::endl;
+    }
     outData << model[0].chrom[i] << " ";
   }
   outData.close();
 
-  modelFitness<< "./data/model/" << argv[1] << "_fitness_" << generation << ".txt";
-  outData.open(modelFitness.str().c_str(), std::ios::trunc);  
+  modelFitness<< "./data/model/" << argv[1] << "_fitness_" << ".txt";
+  outData.open(modelFitness.str().c_str(), std::ios::out|std::ios::app);  
   if (!outData)
   {
     cout << "Error: Can't open the model fitness file.\n";
     exit(1);
-  }  
-  outData << average_fitness << " " << model[0].fitness;
+  }
+  outData << generation<<": ";
+  outData << average_fitness << " " << model[0].fitness<< std::endl;
   outData.close();
 }

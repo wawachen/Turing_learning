@@ -208,28 +208,33 @@ void output_best_classifier(const int &generation, char *argv[])
 {
   stringstream classifierGenes, classifierFitness;
   
-  classifierGenes<< "./data/classifier/" << argv[1] << "_genes_" << generation << ".txt";
-  outData.open(classifierGenes.str().c_str(), std::ios::trunc);  
+  classifierGenes<< "./data/classifier/" << argv[1] << "_genes_" << ".txt";
+  outData.open(classifierGenes.str().c_str(), std::ios::out|std::ios::app);  
   if (!outData)
   {
     cout << "Error: Can't open the classifier gene file.\n";
     exit(1);
   }  
+  outData << generation<<": ";
   for(unsigned i = 0; i < CLASSIFIER_GENESIZE/2; i++)
   {
     //outData << classifier[0].chrom[i] << " " << classifier[0].chrom[i + CLASSIFIER_GENESIZE/2] << " ";
+    if(i== (CLASSIFIER_GENESIZE/2-1)){
+      outData << classifier[0].chrom[i] << std::endl;
+    }
     outData << classifier[0].chrom[i] << " ";
   }
   outData.close();
 
-  classifierFitness<< "./data/classifier/" << argv[1] << "_fitness_" << generation << ".txt";
-  outData.open(classifierFitness.str().c_str(), std::ios::trunc);  
+  classifierFitness<< "./data/classifier/" << argv[1] << "_fitness_" << ".txt";
+  outData.open(classifierFitness.str().c_str(), std::ios::out|std::ios::app);  
   if (!outData)
   {
     cout << "Error: Can't open the classifier fitness file.\n";
     exit(1);
   }  
-  outData << average_fitness << " " << classifier[0].fitness;
+  outData << generation<<": ";
+  outData << average_fitness << " " << classifier[0].fitness<< std::endl;
   outData.close();
 }
 
