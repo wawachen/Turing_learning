@@ -204,7 +204,7 @@ void swap_classifier_population(int a, int b)
 }
 
 
-void output_best_classifier(const int &generation, char *argv[])
+void output_best_classifier(char *argv[])
 {
   stringstream classifierGenes, classifierFitness;
   
@@ -215,14 +215,15 @@ void output_best_classifier(const int &generation, char *argv[])
     cout << "Error: Can't open the classifier gene file.\n";
     exit(1);
   }  
-  outData << generation<<": ";
+  
   for(unsigned i = 0; i < CLASSIFIER_GENESIZE/2; i++)
   {
     //outData << classifier[0].chrom[i] << " " << classifier[0].chrom[i + CLASSIFIER_GENESIZE/2] << " ";
     if(i== (CLASSIFIER_GENESIZE/2-1)){
       outData << classifier[0].chrom[i] << std::endl;
+    }else{
+      outData << classifier[0].chrom[i] << " ";
     }
-    outData << classifier[0].chrom[i] << " ";
   }
   outData.close();
 
@@ -233,7 +234,7 @@ void output_best_classifier(const int &generation, char *argv[])
     cout << "Error: Can't open the classifier fitness file.\n";
     exit(1);
   }  
-  outData << generation<<": ";
+  
   outData << average_fitness << " " << classifier[0].fitness<< std::endl;
   outData.close();
 }

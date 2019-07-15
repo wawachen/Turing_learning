@@ -78,17 +78,17 @@ void model_mutationoperator()
 		   }while(fabs(x)>M_PI);
 		   do
 		   {
-			   sigma_ = model[i].chrom[j + 8 + MODEL_GENESIZE/2] * p_m * exp(gsl_ran_gaussian(r, 1/(2 * sqrt(2 * sqrt(MODEL_GENESIZE/2)))));
+			   sigma_ = model[i].chrom[j + 1 + MODEL_GENESIZE/2] * p_m * exp(gsl_ran_gaussian(r, 1/(2 * sqrt(2 * sqrt(MODEL_GENESIZE/2)))));
 			   if(sigma_ < LOWERBOUND)
 			   {
 				  sigma_ = LOWERBOUND;
 			   }
-			   y = model[i].chrom[j+8] + gsl_ran_gaussian(r, sigma_);
+			   y = model[i].chrom[j+1] + gsl_ran_gaussian(r, sigma_);
 		   }while((y<=0.0) || (fabs(y)>3.7));
 		   model[i].chrom[j + MODEL_GENESIZE/2] = sigma;
 		   model[i].chrom[j] = x;
-		   model[i].chrom[j + 8 + MODEL_GENESIZE/2] = sigma_;
-		   model[i].chrom[j+8] = y;
+		   model[i].chrom[j + 1 + MODEL_GENESIZE/2] = sigma_;
+		   model[i].chrom[j+1] = y;
 		}
     }
 }
@@ -134,7 +134,7 @@ void swap_model_population(int a, int b)
     model[b].fitness = temp.fitness;
 }
 
-void output_best_model(const int &generation, char *argv[]) //model[0]
+void output_best_model(char *argv[]) //model[0]
 {
   stringstream modelGenes, modelFitness;
 
@@ -145,15 +145,16 @@ void output_best_model(const int &generation, char *argv[]) //model[0]
     cout << "Error: Can't open the model gene file.\n";
     exit(1);
   }  
-  outData << generation<<": ";
+  
   for(unsigned i = 0; i < MODEL_GENESIZE/2; i++)
   {
-    //outData << model[0].chrom[i] << " " << model[0].chrom[i + MODEL_GENESIZE/2] << " ";
     if(i== (MODEL_GENESIZE/2-1)){
       outData << model[0].chrom[i] << std::endl;
+    }else{
+      outData << model[0].chrom[i] << " ";
     }
-    outData << model[0].chrom[i] << " ";
   }
+  
   outData.close();
 
   modelFitness<< "./data/model/" << argv[1] << "_fitness_" << ".txt";
@@ -163,7 +164,7 @@ void output_best_model(const int &generation, char *argv[]) //model[0]
     cout << "Error: Can't open the model fitness file.\n";
     exit(1);
   }
-  outData << generation<<": ";
+  
   outData << average_fitness << " " << model[0].fitness<< std::endl;
   outData.close();
 }

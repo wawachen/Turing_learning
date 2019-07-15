@@ -23,7 +23,7 @@ void CF_elmanNetwork(const double CF_input[], const unsigned &C_num); //for thre
 void calculate_classifier_fitness();     
 void classifier_parameters_set();     
 void classifier_initial();              
-void output_best_classifier(const int &generation, char *argv[]);
+void output_best_classifier(char *argv[]);
 //void output_classifier_genes(const int &generation, char *argv[]);
 
 #endif

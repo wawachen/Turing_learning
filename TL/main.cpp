@@ -29,7 +29,6 @@ int main(int argc, char *argv[])
 
   //std::clock_t start;
   //double duration;
-  
   while (generation < MAX_GENERATION)
   {
 
@@ -67,8 +66,8 @@ int main(int argc, char *argv[])
     sort_model_population();
     sort_classifier_population();
 
-    output_best_model(generation, argv);
-    output_best_classifier(generation, argv);
+    output_best_model(argv);
+    output_best_classifier(argv);
 
     generate_next_model();
     generate_next_classifier();

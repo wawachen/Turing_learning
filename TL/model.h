@@ -19,6 +19,6 @@ void model_selectoperator();
 void model_mutationoperator();
 void swap_model_population(int a, int b);
 void sort_model_population();
-void output_best_model(const int &generation, char *argv[]);
+void output_best_model(char *argv[]);
 
 #endif
