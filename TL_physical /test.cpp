@@ -74,57 +74,57 @@ double replica_cal_distance(Agent1* r)
 }
 
 //simlate the sensor readings of tof sensor on the agent 
-double agent_get_reading(Agent* a)
+double agent_get_reading(void)
 {
-  double x1 = a->pos.x;
-  double y1 = a->pos.y;
-  double k = tan(a->angle);
-  Enki::Point new_pos;
+   char RxBuffer[45];
+   char *portName = "/dev/rfcomm0";
+   char command[20];
+   SerialComm *comm;
+   uint8_t bytesToSend;
+   int bytes;
+   char msg[50];
+   unsigned int distance;
+   int err = 0;
 
- //if parallel
-  if(a->angle==0.0){
-    new_pos = Enki::Point(x2,f(x2,x1,y1,k));
-    return (a->pos-new_pos).norm()-robot_radius;
-  } else if((a->angle==1.0*M_PI)||(a->angle==(-1.0*M_PI))){
-    new_pos = Enki::Point(0,f(0,x1,y1,k));
-    return (a->pos-new_pos).norm()-robot_radius;
-  } else if(a->angle==0.5*M_PI){
-    new_pos = Enki::Point(g(y2,x1,y1,k),y2);
-    return (a->pos-new_pos).norm()-robot_radius;
-  } else if(a->angle==(-0.5*M_PI)){
-    new_pos = Enki::Point(g(0,x1,y1,k),0);
-    return (a->pos-new_pos).norm()-robot_radius;
-  } else{
-  //if not parallel
-  //find the intersecting points
-    Enki::Point points[4]={
-      Enki::Point(g(y2,x1,y1,k),y2),
-      Enki::Point(g(0,x1,y1,k),0),
-      Enki::Point(0,f(0,x1,y1,k)),
-      Enki::Point(x2,f(x2,x1,y1,k))
-    };
-    std::vector<int> inner_check;
 
-    if(g(y2,x1,y1,k)>=0 && g(y2,x1,y1,k)<=x2){inner_check.push_back(0);}
-    if(g(0,x1,y1,k)>=0 && g(0,x1,y1,k)<=x2){inner_check.push_back(1);}
-    if(f(0,x1,y1,k)>=0 && f(0,x1,y1,k)<=y2){inner_check.push_back(2);}
-    if(f(x2,x1,y1,k)>=0 && f(x2,x1,y1,k)<=y2){inner_check.push_back(3);}
+   comm = new SerialComm();
+   err = comm->connect(portName);
+   if(err==-1) {
+        std::cerr << "Unable to open serial port " << portName << std::endl;
+        return 1;
+   }
+   bytesToSend = 2;
+   command[0]=-0x0D;;          //ToF request
+   command[1]=0;               //binary command ending
 
-    if((a->angle>0.0)&&(a->angle<1.0*M_PI)){
-      if(points[inner_check[0]].y>points[inner_check[1]].y){
-        return (a->pos-points[inner_check[0]]).norm()-robot_radius;
-      }else{
-        return (a->pos-points[inner_check[1]]).norm()-robot_radius;
-      }
-    }else if((a->angle<0.0)&&(a->angle>(-1.0*M_PI))){
-      if(points[inner_check[0]].y>points[inner_check[1]].y){
-        return (a->pos-points[inner_check[1]]).norm()-robot_radius;
-      }else{
-        return (a->pos-points[inner_check[0]]).norm()-robot_radius;
-      }
-    } 
-
-  } 
+   comm->flush();
+   bytes=comm->writeData(command, bytesToSend, 1000000);
+    
+   memset(RxBuffer, 0x0, 45);
+   bytes=comm->readData((char*)RxBuffer,2,1000000);
+            
+  if(bytes == 0) {
+        std::cerr << "Nothing found"<< std::endl;
+        if(comm!=NULL) 
+        {
+            comm->disconnect();
+            comm=NULL;
+        }
+        return 1;
+  } else if(bytes<2) {
+        sprintf(msg, "ToF: only %d bytes red", bytes);
+        std::cerr << msg << std::endl;
+        if(comm!=NULL) 
+        {
+            comm->disconnect();
+            comm=NULL;
+        }
+        return 1;
+  } else {
+        distance = (uint16_t)(((uint8_t)RxBuffer[1]<<8)|((uint8_t)RxBuffer[0]))/10;
+        distance = (distance>200)?200:distance;
+        return distance;
+        }
 }
 
 void AgentBehaviour(const int &C_num)
@@ -143,7 +143,6 @@ void AgentBehaviour(const int &C_num)
     a->rightSpeed = 2 * maxSpeed * CF_output[2] - maxSpeed;
     //std::cout<<"agent:"<<a->leftSpeed<<" "<<a->rightSpeed<<" "<<CF_output[0]<<std::endl;
   }
-  
 }
 
 void ReplicaBehaviour(const int &C_num, double modelValue[2])
