@@ -2,7 +2,7 @@
 #include <vector>
 
 int maxSteps = 100;
-double maxSpeed = 12.8;
+double maxSpeed = 1100.0;
 double maxvalue = 3000.0;
 double y2 = 50;
 double x2 = 50;
@@ -74,7 +74,7 @@ double replica_cal_distance(Agent1* r)
 }
 
 //simlate the sensor readings of tof sensor on the agent 
-double agent_get_reading(void)
+unsigned int agent_get_reading(void)
 {
    char RxBuffer[45];
    char *portName = "/dev/rfcomm0";
@@ -123,25 +123,60 @@ double agent_get_reading(void)
   } else {
         distance = (uint16_t)(((uint8_t)RxBuffer[1]<<8)|((uint8_t)RxBuffer[0]))/10;
         distance = (distance>200)?200:distance;
-        return distance;
+        //close communication
+        if(comm!=NULL) {
+        comm->disconnect();
+        comm=NULL;
         }
+        return distance;
+  }
 }
 
 void AgentBehaviour(const int &C_num)
 {
-  Agent* a = new Agent();
-  TestWorld world(50, 50);
-  world.creatAgent(a);
-
+  double leftSpeed,rightSpeed;
   for (int Step = 0; Step < maxSteps; Step++)
-  {
-    world.run();
-    CF_input[0] = 2*agent_get_reading(a)+1; //modified
+  { 
+    CF_input[0] = (double)agent_get_reading(); 
     CF_input[1] = 1.0;
     CF_elmanNetwork(CF_input, C_num);
-    a->leftSpeed = 2 * maxSpeed * CF_output[1] - maxSpeed;
-    a->rightSpeed = 2 * maxSpeed * CF_output[2] - maxSpeed;
+    leftSpeed = maxSpeed * CF_output[1];
+    rightSpeed = maxSpeed * CF_output[2];
     //std::cout<<"agent:"<<a->leftSpeed<<" "<<a->rightSpeed<<" "<<CF_output[0]<<std::endl;
+
+    	// send moving comand
+    int speed_left = (int)leftSpeed;
+    char high_left = (speed_left>>8) & 0xFF;
+    char low_left = speed_left & 0xFF;
+    int speed_right = (int)rightSpeed;
+    char high_right = (speed_right>>8) & 0xFF;
+    char low_right = speed_right & 0xFF;
+
+    memset(command, 0x0, 20);
+    sprintf(command, "%c%c%c%c%c%c",-'D', low_left, high_left, low_right, high_right,0);
+    comm->writeData(command, 6, 500000);
+    //std::cout<<"Start moving"<<std::endl;
+
+    //usleep(2000000);
+
+  }
+  //send stop comand 
+  speed_left = 0;
+  high_left = (speed_left>>8) & 0xFF;
+  low_left = speed_left & 0xFF;
+  speed_right = 0;
+  high_right = (speed_right>>8) & 0xFF;
+  low_right = speed_right & 0xFF;
+
+  memset(command, 0x0, 20);
+  sprintf(command, "%c%c%c%c%c%c",-'D', low_left, high_left, low_right, high_right,0);
+  comm->writeData(command, 6, 20000);
+  //std::cout<<"Stop moving"<<std::endl;
+
+  //close communication
+  if(comm!=NULL) {
+        comm->disconnect();
+        comm=NULL;
   }
 }
 
