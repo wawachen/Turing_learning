@@ -4,9 +4,9 @@
 
 CC = g++
 CFLAGS = -pipe -O2 -Wall -Wextra
-HEADERS = TestEnki.h model.h classifier.h parameters.h test.h
+HEADERS = TestEnki.h model.h classifier.h parameters.h test.h SerialComm.h
 ODIR = obj
-_OBJ = test.o TestEnki.o model.o classifier.o main.o
+_OBJ = test.o TestEnki.o model.o classifier.o SerialComm.o main.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 IDIR = -I. -I/usr/include -I/home/miro/Turing_learning/enki
 LDIR = -L. -L/home/miro/Turing_learning/enki/enki -L/usr/lib -lm -lglut -lGLU -lGL -lenki -lgsl -lgslcblas

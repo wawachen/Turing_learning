@@ -12,7 +12,7 @@ using namespace std;
 #define CLASSIFIER_SELECTIONSIZE     50            //(mu+lmbuda):50+50
 #define MODEL_GENESIZE               4             //the same structure as the animal
 #define MODEL_SELECTIONSIZE          50            //(mu+lmbuda):50+50
-#define MAX_GENERATION               200        //maximum generations
+#define MAX_GENERATION               10        //maximum generations
 #define CLASSIFIER_POPSIZE           100            //number of classifier population size
 #define MODEL_POPSIZE                100            //number of model population size
 #define LOWERBOUND                   0.01          //lower bound for the mutations

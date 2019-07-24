@@ -1,7 +1,7 @@
 #include "test.h"
 #include <vector>
 
-int maxSteps = 100;
+int maxSteps = 10;
 double maxSpeed = 1100.0;
 double maxvalue = 3000.0;
 double y2 = 50;
@@ -74,25 +74,15 @@ double replica_cal_distance(Agent1* r)
 }
 
 //simlate the sensor readings of tof sensor on the agent 
-unsigned int agent_get_reading(void)
+unsigned int agent_get_reading(SerialComm *comm)
 {
    char RxBuffer[45];
-   char *portName = "/dev/rfcomm0";
    char command[20];
-   SerialComm *comm;
    uint8_t bytesToSend;
    int bytes;
    char msg[50];
    unsigned int distance;
-   int err = 0;
 
-
-   comm = new SerialComm();
-   err = comm->connect(portName);
-   if(err==-1) {
-        std::cerr << "Unable to open serial port " << portName << std::endl;
-        return 1;
-   }
    bytesToSend = 2;
    command[0]=-0x0D;;          //ToF request
    command[1]=0;               //binary command ending
@@ -123,21 +113,30 @@ unsigned int agent_get_reading(void)
   } else {
         distance = (uint16_t)(((uint8_t)RxBuffer[1]<<8)|((uint8_t)RxBuffer[0]))/10;
         distance = (distance>200)?200:distance;
-        //close communication
-        if(comm!=NULL) {
-        comm->disconnect();
-        comm=NULL;
-        }
         return distance;
   }
 }
 
 void AgentBehaviour(const int &C_num)
 {
+  char command[20];
+  SerialComm *comm;
+  char *portName = "/dev/rfcomm0";
   double leftSpeed,rightSpeed;
+  char high_left,low_left,high_right,low_right;
+  int speed_left,speed_right;
+  int err = 0;
+
+  comm = new SerialComm();
+  err = comm->connect(portName);
+  if(err==-1) {
+      std::cerr << "Unable to open serial port " << portName << std::endl;
+      return;
+  }
+
   for (int Step = 0; Step < maxSteps; Step++)
   { 
-    CF_input[0] = (double)agent_get_reading(); 
+    CF_input[0] = (double)agent_get_reading(comm); 
     CF_input[1] = 1.0;
     CF_elmanNetwork(CF_input, C_num);
     leftSpeed = maxSpeed * CF_output[1];
@@ -145,19 +144,19 @@ void AgentBehaviour(const int &C_num)
     //std::cout<<"agent:"<<a->leftSpeed<<" "<<a->rightSpeed<<" "<<CF_output[0]<<std::endl;
 
     	// send moving comand
-    int speed_left = (int)leftSpeed;
-    char high_left = (speed_left>>8) & 0xFF;
-    char low_left = speed_left & 0xFF;
-    int speed_right = (int)rightSpeed;
-    char high_right = (speed_right>>8) & 0xFF;
-    char low_right = speed_right & 0xFF;
+    speed_left = (int)leftSpeed;
+    high_left = (speed_left>>8) & 0xFF;
+    low_left = speed_left & 0xFF;
+    speed_right = (int)rightSpeed;
+    high_right = (speed_right>>8) & 0xFF;
+    low_right = speed_right & 0xFF;
 
     memset(command, 0x0, 20);
     sprintf(command, "%c%c%c%c%c%c",-'D', low_left, high_left, low_right, high_right,0);
     comm->writeData(command, 6, 500000);
-    //std::cout<<"Start moving"<<std::endl;
+    std::cout<<"Start moving"<<std::endl;
 
-    //usleep(2000000);
+    usleep(2000000);
 
   }
   //send stop comand 
@@ -171,8 +170,8 @@ void AgentBehaviour(const int &C_num)
   memset(command, 0x0, 20);
   sprintf(command, "%c%c%c%c%c%c",-'D', low_left, high_left, low_right, high_right,0);
   comm->writeData(command, 6, 20000);
-  //std::cout<<"Stop moving"<<std::endl;
-
+  std::cout<<"Stop moving"<<std::endl;
+  usleep(10000);
   //close communication
   if(comm!=NULL) {
         comm->disconnect();

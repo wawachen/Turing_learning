@@ -44,6 +44,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <iostream>
+#include <stdint.h>
 
 class SerialComm {
 

@@ -29,10 +29,11 @@
 #include <iostream>
 #include <stdio.h>
 
+
 int main(int argc, char *argv[]) {
 
     char RxBuffer[45];
-    char *portName = "/dev/cu.e-puck2_04589-UART";
+    char *portName = "/dev/rfcomm0";
     char command[20];
     SerialComm *comm;
     uint8_t bytesToSend;
@@ -106,7 +107,8 @@ int main(int argc, char *argv[]) {
     sprintf(command, "%c%c%c%c%c%c",-'D', low_left, high_left, low_right, high_right,0);
     comm->writeData(command, 6, 20000);
     std::cout<<"Stop moving"<<std::endl;
-
+    
+    usleep(10000);
     //close communication
     if(comm!=NULL) {
         comm->disconnect();
