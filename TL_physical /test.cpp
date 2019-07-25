@@ -76,45 +76,41 @@ double replica_cal_distance(Agent1* r)
 //simlate the sensor readings of tof sensor on the agent 
 unsigned int agent_get_reading(SerialComm *comm)
 {
-   char RxBuffer[45];
-   char command[20];
-   uint8_t bytesToSend;
-   int bytes;
-   char msg[50];
-   unsigned int distance;
+  char RxBuffer[45];
+  char command[20];
+  uint8_t bytesToSend;
+  int bytes;
+  char msg[50];
+  unsigned int distance;
+  int reconnectFlag = 1;
 
-   bytesToSend = 2;
-   command[0]=-0x0D;;          //ToF request
-   command[1]=0;               //binary command ending
-
-   comm->flush();
-   bytes=comm->writeData(command, bytesToSend, 1000000);
-    
-   memset(RxBuffer, 0x0, 45);
-   bytes=comm->readData((char*)RxBuffer,2,1000000);
+  bytesToSend = 2;
+  command[0]=-0x0D;;          //ToF request
+  command[1]=0;               //binary command ending
+   
+  while(reconnectFlag){
+    reconnectFlag = 0;
+    comm->flush();
+    bytes=comm->writeData(command, bytesToSend, 1000000);
+ 
+    memset(RxBuffer, 0x0, 45);
+    bytes=comm->readData((char*)RxBuffer,2,1000000);
             
-  if(bytes == 0) {
+    if(bytes == 0) {
         std::cerr << "Nothing found"<< std::endl;
-        if(comm!=NULL) 
-        {
-            comm->disconnect();
-            comm=NULL;
-        }
-        return 1;
-  } else if(bytes<2) {
+        reconnectFlag = 1;
+        
+    } else if(bytes<2) {
         sprintf(msg, "ToF: only %d bytes red", bytes);
         std::cerr << msg << std::endl;
-        if(comm!=NULL) 
-        {
-            comm->disconnect();
-            comm=NULL;
-        }
-        return 1;
-  } else {
+        reconnectFlag = 1;
+    } else {
         distance = (uint16_t)(((uint8_t)RxBuffer[1]<<8)|((uint8_t)RxBuffer[0]))/10;
         distance = (distance>200)?200:distance;
-        return distance;
+    }
   }
+  return distance;
+   
 }
 
 void AgentBehaviour(const int &C_num)

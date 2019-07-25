@@ -41,6 +41,8 @@ int main(int argc, char *argv[]) {
     char msg[50];
     unsigned int distance;
     int err = 0;
+    int reconnectFlag = 1;
+
 
     comm = new SerialComm();
     err = comm->connect(portName);
@@ -48,10 +50,14 @@ int main(int argc, char *argv[]) {
         std::cerr << "Unable to open serial port " << portName << std::endl;
         return 1;
     }
-    bytesToSend = 2;
-    command[0]=-0x0D;;          //ToF request
-    command[1]=0;               //binary command ending
-
+    
+    
+   // bytesToSend = 2;
+    //command[0]=-0x0D;;          //ToF request
+    //command[1]=0;               //binary command ending
+   /*
+    while(reconnectFlag){
+    reconnectFlag = 0;
     comm->flush();
     bytes=comm->writeData(command, bytesToSend, 1000000);
     
@@ -60,27 +66,20 @@ int main(int argc, char *argv[]) {
             
     if(bytes == 0) {
         std::cerr << "Nothing found"<< std::endl;
-        if(comm!=NULL) 
-        {
-            comm->disconnect();
-            comm=NULL;
-        }
-        return 1;
+        reconnectFlag = 1;
+  
     } else if(bytes<2) {
         sprintf(msg, "ToF: only %d bytes red", bytes);
         std::cerr << msg << std::endl;
-        if(comm!=NULL) 
-        {
-            comm->disconnect();
-            comm=NULL;
-        }
-        return 1;
+        reconnectFlag = 1;
     } else {
         distance = (uint16_t)(((uint8_t)RxBuffer[1]<<8)|((uint8_t)RxBuffer[0]))/10;
         distance = (distance>200)?200:distance;
-        std::cout<< "The current distance is : "<< distance << std::endl;
-    }
-	
+        
+     }
+     
+   }
+    std::cout<< "The current distance is : "<< distance << std::endl; */
 	// send moving comand
     int speed_left = 100;
     char high_left = (speed_left>>8) & 0xFF;
