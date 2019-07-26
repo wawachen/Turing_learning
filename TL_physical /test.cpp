@@ -113,22 +113,13 @@ unsigned int agent_get_reading(SerialComm *comm)
    
 }
 
-void AgentBehaviour(const int &C_num)
+void AgentBehaviour(const int &C_num,SerialComm *comm)
 {
   char command[20];
-  SerialComm *comm;
-  char *portName = "/dev/rfcomm0";
+  
   double leftSpeed,rightSpeed;
   char high_left,low_left,high_right,low_right;
   int speed_left,speed_right;
-  int err = 0;
-
-  comm = new SerialComm();
-  err = comm->connect(portName);
-  if(err==-1) {
-      std::cerr << "Unable to open serial port " << portName << std::endl;
-      return;
-  }
 
   for (int Step = 0; Step < maxSteps; Step++)
   { 
@@ -138,7 +129,7 @@ void AgentBehaviour(const int &C_num)
     leftSpeed = maxSpeed * CF_output[1];
     rightSpeed = maxSpeed * CF_output[2];
     //std::cout<<"agent:"<<a->leftSpeed<<" "<<a->rightSpeed<<" "<<CF_output[0]<<std::endl;
-
+    std::cout<<"The sensor reading: "<< (double)agent_get_reading(comm)<<std::endl;
     	// send moving comand
     speed_left = (int)leftSpeed;
     high_left = (speed_left>>8) & 0xFF;
@@ -150,7 +141,7 @@ void AgentBehaviour(const int &C_num)
     memset(command, 0x0, 20);
     sprintf(command, "%c%c%c%c%c%c",-'D', low_left, high_left, low_right, high_right,0);
     comm->writeData(command, 6, 500000);
-    std::cout<<"Start moving"<<std::endl;
+    //std::cout<<"Start moving"<<std::endl;
 
     usleep(2000000);
 
@@ -166,13 +157,9 @@ void AgentBehaviour(const int &C_num)
   memset(command, 0x0, 20);
   sprintf(command, "%c%c%c%c%c%c",-'D', low_left, high_left, low_right, high_right,0);
   comm->writeData(command, 6, 20000);
-  std::cout<<"Stop moving"<<std::endl;
-  usleep(10000);
-  //close communication
-  if(comm!=NULL) {
-        comm->disconnect();
-        comm=NULL;
-  }
+  //std::cout<<"Stop moving"<<std::endl;
+  usleep(2000000);
+  
 }
 
 void ReplicaBehaviour(const int &C_num, double modelValue[2])

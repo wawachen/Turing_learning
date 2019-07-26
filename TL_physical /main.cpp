@@ -10,6 +10,10 @@
 #include <ctime>
 #include <cstdio>
 
+#include "SerialComm.h"
+#include <iostream>
+#include <stdio.h>
+
 gsl_rng *r;
 ofstream outData;
 void gsl_init();
@@ -22,6 +26,9 @@ int main(int argc, char *argv[])
   int C_num, M_num, R_num;
   int generation = 0;
   bool flag[2] = {true, false};
+  SerialComm *comm;
+  char *portName = "/dev/rfcomm0";
+  int err = 0;
 
   gsl_init();
   generate_initial_classifiers();
@@ -29,6 +36,13 @@ int main(int argc, char *argv[])
 
   //std::clock_t start;
   //double duration;
+  comm = new SerialComm();
+  err = comm->connect(portName);
+  if(err==-1) {
+    std::cerr << "Unable to open serial port " << portName << std::endl;
+    return 1;
+  }
+
   while (generation < MAX_GENERATION)
   {
 
@@ -40,14 +54,14 @@ int main(int argc, char *argv[])
       for (unsigned i = 0; i < 2; i++)
       {modelValue[i] = model[M_num].chrom[i];}
       //std::cout <<"The model parameter is :"<<"k= " << modelValue[0] <<" b="<< modelValue[1]<<std::endl;
-      
+
       for(C_num = 0; C_num < CLASSIFIER_POPSIZE; C_num++)
       {
         for (R_num = 0; R_num < 2; R_num++)
         {
           if (flag[R_num] == true) 
           {
-            AgentBehaviour(C_num);
+            AgentBehaviour(C_num,comm);
             calculate_classifier_fitness(C_num, M_num, R_num);
             classifier_initial();
           }
@@ -77,6 +91,13 @@ int main(int argc, char *argv[])
 
     generation++;    
   }
+
+  //close communication
+  if(comm!=NULL) {
+        comm->disconnect();
+        comm=NULL;
+  }
+
   gsl_rng_free(r);
   return 0;    
 }

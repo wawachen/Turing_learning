@@ -9,12 +9,12 @@
 using namespace std;
 //********************COEA constants*************
 #define CLASSIFIER_GENESIZE          106         //CF_input_n * CF_hidden_n + CF_hidden_n * CF_hidden_n + (CF_hidden_n + 1) * CF_output_n
-#define CLASSIFIER_SELECTIONSIZE     50            //(mu+lmbuda):50+50
+#define CLASSIFIER_SELECTIONSIZE     5            //(mu+lmbuda):50+50
 #define MODEL_GENESIZE               4             //the same structure as the animal
-#define MODEL_SELECTIONSIZE          50            //(mu+lmbuda):50+50
+#define MODEL_SELECTIONSIZE          5            //(mu+lmbuda):50+50
 #define MAX_GENERATION               10        //maximum generations
-#define CLASSIFIER_POPSIZE           100            //number of classifier population size
-#define MODEL_POPSIZE                100            //number of model population size
+#define CLASSIFIER_POPSIZE           10            //number of classifier population size
+#define MODEL_POPSIZE                10            //number of model population size
 #define LOWERBOUND                   0.01          //lower bound for the mutations
 //********************classifier constants*******
 const unsigned CF_input_n = 2;                     //including bias;

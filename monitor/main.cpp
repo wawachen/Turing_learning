@@ -52,10 +52,10 @@ int main(int argc, char *argv[]) {
     }
     
     
-   // bytesToSend = 2;
-    //command[0]=-0x0D;;          //ToF request
-    //command[1]=0;               //binary command ending
-   /*
+    bytesToSend = 2;
+    command[0]=-0x0D;;          //ToF request
+    command[1]=0;               //binary command ending
+   
     while(reconnectFlag){
     reconnectFlag = 0;
     comm->flush();
@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
      }
      
    }
-    std::cout<< "The current distance is : "<< distance << std::endl; */
+    std::cout<< "The current distance is : "<< distance << std::endl; 
 	// send moving comand
     int speed_left = 100;
     char high_left = (speed_left>>8) & 0xFF;

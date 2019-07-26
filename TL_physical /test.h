@@ -5,13 +5,9 @@
 #include "parameters.h"
 #include "classifier.h"
 #include "model.h"
-
 #include "SerialComm.h"
-#include <math.h>
-#include <iostream>
-#include <stdio.h>
 
-void AgentBehaviour(const int &C_num);
+void AgentBehaviour(const int &C_num,SerialComm *comm);
 void ReplicaBehaviour(const int &C_num,double modelValue[2]);
 //calculate the real distance from replica to the wall
 double replica_cal_distance(Agent1* r);
