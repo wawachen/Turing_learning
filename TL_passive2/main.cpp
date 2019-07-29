@@ -29,38 +29,31 @@ int main(int argc, char *argv[])
 
   //std::clock_t start;
   //double duration;
-  Agent* a = new Agent();
-  TestWorld world(50, 50);
-  world.creatAgent(a);
-
-  Agent1* r = new Agent1();
-  TestWorld world1(50, 50);
-  world1.creatReplica(r);
-
   while (generation < MAX_GENERATION)
   {
 
     //start = std::clock();
+
     for (M_num=0; M_num < MODEL_POPSIZE; M_num++)
     {
       double modelValue[2]; // k and b for y = k*x+b
       for (unsigned i = 0; i < 2; i++)
       {modelValue[i] = model[M_num].chrom[i];}
       //std::cout <<"The model parameter is :"<<"k= " << modelValue[0] <<" b="<< modelValue[1]<<std::endl;
-
+      
       for(C_num = 0; C_num < CLASSIFIER_POPSIZE; C_num++)
       {
         for (R_num = 0; R_num < 2; R_num++)
         {
           if (flag[R_num] == true) 
           {
-            AgentBehaviour(C_num,world,a);
+            AgentBehaviour(C_num);
             calculate_classifier_fitness(C_num, M_num, R_num);
             classifier_initial();
           }
           else
           {
-            ReplicaBehaviour(C_num, modelValue,world1,r);
+            ReplicaBehaviour(C_num, modelValue);
             calculate_classifier_fitness(C_num, M_num, R_num);
             calculate_model_fitness(C_num, M_num, R_num);
             classifier_initial();

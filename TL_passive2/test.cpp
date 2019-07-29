@@ -127,42 +127,122 @@ double agent_get_reading(Agent* a)
   } 
 }
 
-void random_move_replica(Agent1* r){
-   r->leftSpeed = UniformRand(robot_radius, world_width - robot_radius)();
-   r->rightSpeed = UniformRand(robot_radius, world_width - robot_radius)();
-   
-}
-
-void random_move_agent(Agent* a){
-   a->leftSpeed = UniformRand(robot_radius, world_width - robot_radius)();
-   a->rightSpeed = UniformRand(robot_radius, world_width - robot_radius)();
-}
-
-void AgentBehaviour(const int &C_num,TestWorld world,Agent* a)
+void AgentBehaviour(const int &C_num)
 {
+  int motion_num;
+  double num1,num2;
+  Agent* a = new Agent();
+  TestWorld world(50, 50);
+  world.creatAgent(a);
+
   for (int Step = 0; Step < maxSteps; Step++)
   {
+    motion_num = Step%4;
+
+    switch(motion_num){
+      case 0:
+        num1 = 0.0;
+        num2 = 0.0;
+        break;
+      case 1:
+        num1 = 1.0;
+        num2 = 0.0;
+        break;
+      case 2:
+        num1 = 0.0;
+        num2 = 1.0;
+        break;
+      case 3:
+        num1 = 1.0;
+        num2 = 1.0;
+    }
+
     world.run();
-    CF_input[0] = 2*agent_get_reading(a)+1; //modified
-    CF_input[1] = 1.0;
+    CF_input[0] = 2*agent_get_reading(a)+1;
+    CF_input[1] = num1;
+    CF_input[2] = num2;
+    CF_input[3] = 1.0;
+
     CF_elmanNetwork(CF_input, C_num);
-    a->leftSpeed = 2 * maxSpeed * CF_output[1] - maxSpeed;
-    a->rightSpeed = 2 * maxSpeed * CF_output[2] - maxSpeed;
+    
+    switch(motion_num){
+      case 0:
+        a->leftSpeed = 6.0;
+        a->rightSpeed = 6.0;
+        break;
+      case 1:
+        a->leftSpeed = -6.0;
+        a->rightSpeed = -6.0;
+        break;
+      case 2:
+        a->leftSpeed = 3.0;
+        a->rightSpeed = 3.0;
+        break;
+      case 3:
+        a->leftSpeed = -3.0;
+        a->rightSpeed = -3.0;
+    }
+    
     //std::cout<<"agent:"<<a->leftSpeed<<" "<<a->rightSpeed<<" "<<CF_output[0]<<std::endl;
   }
-  
 }
 
-void ReplicaBehaviour(const int &C_num, double modelValue[2],TestWorld world,Agent1* r)
+void ReplicaBehaviour(const int &C_num, double modelValue[2])
 {
+  int motion_num;
+  double num1,num2;
+  Agent1* r = new Agent1();
+  TestWorld world(50, 50);
+  world.creatReplica(r);
+  
   for (int Step = 0; Step < maxSteps; Step++)
   {
+    motion_num = Step%4;
+
+    switch(motion_num){
+      case 0:
+        num1 = 0.0;
+        num2 = 0.0;
+        break;
+      case 1:
+        num1 = 1.0;
+        num2 = 0.0;
+        break;
+      case 2:
+        num1 = 0.0;
+        num2 = 1.0;
+        break;
+      case 3:
+        num1 = 1.0;
+        num2 = 1.0;
+    }
+
     world.run();
     CF_input[0] = modelValue[0]*replica_cal_distance(r)+modelValue[1];
-    CF_input[1] = 1.0;
+    CF_input[1] = num1;
+    CF_input[2] = num2;
+    CF_input[3] = 1.0;
+
     CF_elmanNetwork(CF_input, C_num);
-    r->leftSpeed = 2 * maxSpeed * CF_output[1] - maxSpeed;
-    r->rightSpeed = 2 * maxSpeed * CF_output[2] - maxSpeed;
+
+    switch(motion_num){
+      case 0:
+        r->leftSpeed = 6.0;
+        r->rightSpeed = 6.0;
+        break;
+      case 1:
+        r->leftSpeed = -6.0;
+        r->rightSpeed = -6.0;
+        break;
+      case 2:
+        r->leftSpeed = 3.0;
+        r->rightSpeed = 3.0;
+        break;
+      case 3:
+        r->leftSpeed = -3.0;
+        r->rightSpeed = -3.0;
+    }
+
     //std::cout<<"model:"<<r->leftSpeed<<" "<<r->rightSpeed<<" "<<CF_output[0]<<std::endl;
   }
 }
