@@ -3,7 +3,6 @@
 
 int maxSteps = 10;
 double maxSpeed = 1100.0;
-double maxvalue = 3000.0;
 double y2 = 50;
 double x2 = 50;
 extern double robot_radius;
