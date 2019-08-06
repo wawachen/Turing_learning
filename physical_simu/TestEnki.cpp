@@ -10,7 +10,7 @@ double robot_radius = 3.7;
 double world_width = 50;
 double world_height = 50;
 //time
-double ctrl_stepsize = 1;
+double ctrl_stepsize = 0.1;
 //Agent
 Agent::Agent(): EPuck(CAPABILITY_BASIC_SENSORS){}
 
@@ -122,86 +122,46 @@ TestWorld::~TestWorld()
 
 void TestWorld::creatAgent(Agent* a)
 {
-  //Agent* a = new Agent();
   Enki::Point new_pos;
-  bool conflict = true;
-  unsigned c_conflict = 0;
-  while (conflict)
-  {
-    conflict = false;
-    new_pos = Enki::Point(
-    UniformRand(robot_radius, world_width - robot_radius)(),
-    UniformRand(robot_radius, world_height - robot_radius)()
-    );
-    for (Enki::World::ObjectsIterator i=objects.begin();i != objects.end();++i)
-    {
-      Agent* a_other = dynamic_cast<Agent*>(*i);
-      if (a_other)
-      {
-        if ((a_other->pos - new_pos).norm2() < 4. * robot_radius ^ 2)
-        {
-          conflict = true;
-          c_conflict++;
-          if (c_conflict > c_agent * c_agent + 1000)
-          {
-            std::cerr<<"Aborting because of too many attempts to put agent in the arena."<< std::endl;
-            exit(1);
-          }
-          break;
-        }
-      }
-     }
-     if (conflict == false)
-        c_conflict = 0;
-  }
+  new_pos = Enki::Point(25,25);
   a->pos = new_pos;
-  a->angle = UniformRand(0, 2.*M_PI)();
+  a->angle = 0.5*M_PI;
   addObject(a);
-}
-
-void TestWorld::creatReplica(Agent1* r)
-{
-  //Replica* r = new Replica(modelValue);
-  Enki::Point new_pos;
-  bool conflict = true;
-  unsigned c_conflict = 0;
-  while (conflict)
-  {
-    conflict = false;
-    new_pos = Enki::Point(
-    UniformRand(robot_radius, world_width - robot_radius)(),
-    UniformRand(robot_radius, world_height - robot_radius)()
-    );
-    for (Enki::World::ObjectsIterator i=objects.begin();i != objects.end();++i)
-    {
-      Agent1* r_other = dynamic_cast<Agent1*>(*i);
-      if (r_other)
-      {
-        if ((r_other->pos - new_pos).norm2() < 4. * robot_radius ^ 2)
-        {
-          conflict = true;
-          c_conflict++;
-          if (c_conflict > c_replica * c_replica + 1000)
-          {
-            std::cerr<<"Aborting because of too many attempts to put agent in the arena."<< std::endl;
-            exit(1);
-          }
-          break;
-        }
-      }
-     }
-     if (conflict == false)
-        c_conflict = 0;
-  }
-  r->pos = new_pos;
-  r->angle = UniformRand(0, 2.*M_PI)();
-  addObject(r);
 }
 
 void TestWorld::run()
 {
-    step(ctrl_stepsize, 1);
+    step(ctrl_stepsize, 10);
 }
+
+//world1
+TestWorld1::TestWorld1(double width, double height): Enki::World(width, height)
+{
+  
+}
+
+TestWorld1::~TestWorld1() 
+{
+   //std::cout<< "world deleted"<<std::endl;
+}
+
+
+void TestWorld1::creatReplica(Agent1* r)
+{
+  Enki::Point new_pos;
+  new_pos = Enki::Point(25,25);
+  r->pos = new_pos;
+  r->angle = 0.5*M_PI;
+  addObject(r);
+}
+
+void TestWorld1::run()
+{
+    step(ctrl_stepsize, 10);
+}
+
+
+
 #ifdef ViewerMode
 //Viewer
 TestViewer::TestViewer(World *world, unsigned maxSteps, unsigned timeMultiplier, QWidget *parent):
