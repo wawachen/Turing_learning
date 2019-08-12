@@ -81,10 +81,10 @@ int main(int argc, char *argv[]) {
    }
     std::cout<< "The current distance is : "<< distance << std::endl; 
 	// send moving comand
-    int speed_left = 100;
+    int speed_left = -1000;
     char high_left = (speed_left>>8) & 0xFF;
     char low_left = speed_left & 0xFF;
-    int speed_right = 100;
+    int speed_right = -1000;
     char high_right = (speed_right>>8) & 0xFF;
     char low_right = speed_right & 0xFF;
 
