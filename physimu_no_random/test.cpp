@@ -127,122 +127,93 @@ double agent_get_reading(Agent* a)
   } 
 }
 
-void AgentBehaviour(const int &C_num)
+void Agent_output_information(Agent* a,char *argv[]){
+  stringstream position_track,speed_track;
+  position_track<< "./data/position/" << argv[1] << "Agent_positionTrack" << ".txt";
+  outData.open(position_track.str().c_str(), std::ios::out|std::ios::app);  
+  if (!outData)
+  {
+    cout << "Error: Can't open the file.\n";
+    exit(1);
+  }  
+  
+  outData << a->pos.x <<" "<< a->pos.y << std::endl;
+  outData.close();
+
+  speed_track<< "./data/speed/" << argv[1] << "Agent_speedTrack" << ".txt";
+  outData.open(speed_track.str().c_str(), std::ios::out|std::ios::app);  
+  if (!outData)
+  {
+    cout << "Error: Can't open the file.\n";
+    exit(1);
+  }  
+  
+  outData <<a->leftSpeed<<" "<<a->rightSpeed<< std::endl;
+  outData.close();
+}
+
+void replica_output_information(Agent1* r,char *argv[]){
+  stringstream position_track,speed_track;
+  position_track<< "./data/position/" << argv[1] << "Replica_positionTrack" << ".txt";
+  outData.open(position_track.str().c_str(), std::ios::out|std::ios::app);  
+  if (!outData)
+  {
+    cout << "Error: Can't open the file.\n";
+    exit(1);
+  }  
+  
+  outData << r->pos.x <<" "<< r->pos.y << std::endl;
+  outData.close();
+
+  speed_track<< "./data/speed/" << argv[1] << "Replica_speedTrack" << ".txt";
+  outData.open(speed_track.str().c_str(), std::ios::out|std::ios::app);  
+  if (!outData)
+  {
+    cout << "Error: Can't open the file.\n";
+    exit(1);
+  }  
+  
+  outData <<r->leftSpeed<<" "<<r->rightSpeed<< std::endl;
+  outData.close();
+}
+
+std::tuple<double, double,double> AgentBehaviour(const int &C_num,double old_x,double old_y,double old_o,char *argv[])
 {
-  int motion_num;
-  double num1,num2;
   Agent* a = new Agent();
   TestWorld world(50, 50);
-  world.creatAgent(a);
+  world.creatAgent(a,old_x,old_y,old_o);
 
   for (int Step = 0; Step < maxSteps; Step++)
   {
-    motion_num = Step%4;
-
-    switch(motion_num){
-      case 0:
-        num1 = 0.0;
-        num2 = 0.0;
-        break;
-      case 1:
-        num1 = 1.0;
-        num2 = 0.0;
-        break;
-      case 2:
-        num1 = 0.0;
-        num2 = 1.0;
-        break;
-      case 3:
-        num1 = 1.0;
-        num2 = 1.0;
-    }
-
     world.run();
-    CF_input[0] = 2*std::min(agent_get_reading(a)/200.0,1.0)+1;
-    CF_input[1] = num1;
-    CF_input[2] = num2;
-    CF_input[3] = 1.0;
-
+    CF_input[0] = 2*std::min(agent_get_reading(a)/200.0,1.0)+1; //modified
+    CF_input[1] = 1.0;
     CF_elmanNetwork(CF_input, C_num);
-    
-    switch(motion_num){
-      case 0:
-        a->leftSpeed = 6.0;
-        a->rightSpeed = 6.0;
-        break;
-      case 1:
-        a->leftSpeed = -6.0;
-        a->rightSpeed = -6.0;
-        break;
-      case 2:
-        a->leftSpeed = 3.0;
-        a->rightSpeed = 3.0;
-        break;
-      case 3:
-        a->leftSpeed = -3.0;
-        a->rightSpeed = -3.0;
-    }
-    
+    a->leftSpeed = 2 * maxSpeed * CF_output[1] - maxSpeed;
+    a->rightSpeed = 2 * maxSpeed * CF_output[2] - maxSpeed;
+    //Agent_output_information(a,argv);
     //std::cout<<"agent:"<<a->leftSpeed<<" "<<a->rightSpeed<<" "<<CF_output[0]<<std::endl;
   }
+  
+  return std::make_tuple(a->pos.x,a->pos.y,a->angle);
 }
 
-void ReplicaBehaviour(const int &C_num, double modelValue[2])
+std::tuple<double, double,double> ReplicaBehaviour(const int &C_num, double modelValue[2],double old_x,double old_y,double old_o,char *argv[])
 {
-  int motion_num;
-  double num1,num2;
   Agent1* r = new Agent1();
   TestWorld world(50, 50);
-  world.creatReplica(r);
+  world.creatReplica(r,old_x,old_y,old_o);
   
   for (int Step = 0; Step < maxSteps; Step++)
   {
-    motion_num = Step%4;
-
-    switch(motion_num){
-      case 0:
-        num1 = 0.0;
-        num2 = 0.0;
-        break;
-      case 1:
-        num1 = 1.0;
-        num2 = 0.0;
-        break;
-      case 2:
-        num1 = 0.0;
-        num2 = 1.0;
-        break;
-      case 3:
-        num1 = 1.0;
-        num2 = 1.0;
-    }
-
     world.run();
     CF_input[0] = modelValue[0]*std::min(replica_cal_distance(r)/200.0,1.0)+modelValue[1];
-    CF_input[1] = num1;
-    CF_input[2] = num2;
-    CF_input[3] = 1.0;
-
+    CF_input[1] = 1.0;
     CF_elmanNetwork(CF_input, C_num);
-
-    switch(motion_num){
-      case 0:
-        r->leftSpeed = 6.0;
-        r->rightSpeed = 6.0;
-        break;
-      case 1:
-        r->leftSpeed = -6.0;
-        r->rightSpeed = -6.0;
-        break;
-      case 2:
-        r->leftSpeed = 3.0;
-        r->rightSpeed = 3.0;
-        break;
-      case 3:
-        r->leftSpeed = -3.0;
-        r->rightSpeed = -3.0;
-    }
-
+    r->leftSpeed = 2 * maxSpeed * CF_output[1] - maxSpeed;
+    r->rightSpeed = 2 * maxSpeed * CF_output[2] - maxSpeed;
     //std::cout<<"model:"<<r->leftSpeed<<" "<<r->rightSpeed<<" "<<CF_output[0]<<std::endl;
+    //replica_output_information(r,argv);
   }
+  return std::make_tuple(r->pos.x,r->pos.y,r->angle);
 }

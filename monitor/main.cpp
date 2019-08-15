@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
     
     
     bytesToSend = 2;
-    command[0]=-0x0D;;          //ToF request
+    command[0]=-0x0D;           //ToF request
     command[1]=0;               //binary command ending
    
     while(reconnectFlag){
@@ -92,7 +92,7 @@ int main(int argc, char *argv[]) {
     sprintf(command, "%c%c%c%c%c%c",-'D', low_left, high_left, low_right, high_right,0);
     comm->writeData(command, 6, 500000);
     std::cout<<"Start moving"<<std::endl;
-    usleep(2000000);
+    usleep(100000);
 
     //send stop comand 
     speed_left = 0;
@@ -107,7 +107,8 @@ int main(int argc, char *argv[]) {
     comm->writeData(command, 6, 20000);
     std::cout<<"Stop moving"<<std::endl;
     
-    usleep(10000);
+   
+    usleep(100000);
     //close communication
     if(comm!=NULL) {
         comm->disconnect();
