@@ -1,0 +1,1 @@
+/usr/bin/c++      CMakeFiles/enkiMinimal.dir/enkiMinimal.cpp.o  -o enkiMinimal  -L/home/miro/Turing_learning/enki -rdynamic ../../enki/libenki.a -Wl,-rpath,/home/miro/Turing_learning/enki 
