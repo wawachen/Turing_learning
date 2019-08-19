@@ -1,7 +1,9 @@
 #include "test.h"
 #include <vector>
 
-int maxSteps = 10;
+int maxSteps_phy = 10;
+int maxSteps_sim = 100;
+
 double maxSpeed_phy = 1100.0;
 double maxSpeed_sim = 12.8;
 double y2 = 50;
@@ -121,7 +123,7 @@ void AgentBehaviour(const int &C_num,SerialComm *comm)
   char high_left,low_left,high_right,low_right;
   int speed_left,speed_right;
 
-  for (int Step = 0; Step < maxSteps; Step++)
+  for (int Step = 0; Step < maxSteps_phy; Step++)
   { 
     CF_input[0] = std::min((double)agent_get_reading(comm)/200.0,1.0);  
     CF_input[1] = 1.0;
@@ -129,7 +131,7 @@ void AgentBehaviour(const int &C_num,SerialComm *comm)
     leftSpeed = 2 * maxSpeed_phy * CF_output[1] - maxSpeed_phy;
     rightSpeed = 2 * maxSpeed_phy * CF_output[2] - maxSpeed_phy;
     //std::cout<<"agent:"<<a->leftSpeed<<" "<<a->rightSpeed<<" "<<CF_output[0]<<std::endl;
-    //std::cout<<"The sensor reading: "<< (double)agent_get_reading(comm)<<std::endl;
+    std::cout<<"The sensor reading: "<< (double)agent_get_reading(comm)<<std::endl;
     	// send moving comand
     speed_left = (int)leftSpeed;
     high_left = (speed_left>>8) & 0xFF;
@@ -143,9 +145,7 @@ void AgentBehaviour(const int &C_num,SerialComm *comm)
     comm->writeData(command, 6, 500000);
     //std::cout<<"Start moving"<<std::endl;
     //std::cout<<"agent:"<<leftSpeed<<" "<<rightSpeed<<std::endl;
-
-    usleep(2000000);
-
+    usleep(1000000);
   }
   //send stop comand 
   speed_left = 0;
@@ -170,7 +170,7 @@ std::tuple<double, double,double> ReplicaBehaviour(const int &C_num, double mode
   TestWorld world(50, 50);
   world.creatReplica(r,old_x,old_y,old_o);
   
-  for (int Step = 0; Step < maxSteps; Step++)
+  for (int Step = 0; Step < maxSteps_sim; Step++)
   {
     world.run();
     CF_input[0] = modelValue[0]*std::min(replica_cal_distance(r)/200.0,1.0)+modelValue[1];

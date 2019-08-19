@@ -13,6 +13,7 @@
 #include "SerialComm.h"
 #include <iostream>
 #include <stdio.h>
+#include <chrono>
 
 gsl_rng *r;
 ofstream outData;
@@ -37,12 +38,16 @@ int main(int argc, char *argv[])
   double old_yr = 25.0;
   double old_or = 0.5*M_PI;
 
+  typedef std::chrono::high_resolution_clock Time;
+  typedef std::chrono::milliseconds ms;
+  typedef std::chrono::duration<float> fsec;
+
   gsl_init();
   generate_initial_classifiers();
   generate_initial_models();
 
-  std::clock_t start;
-  double duration;
+  //std::clock_t start;
+  //double duration;
 
   comm = new SerialComm();
   err = comm->connect(portName);
@@ -63,12 +68,13 @@ int main(int argc, char *argv[])
 
       for(C_num = 0; C_num < CLASSIFIER_POPSIZE; C_num++)
       {
-        start = std::clock();
+        //start = std::clock();
+        //auto t0 = Time::now();
         for (R_num = 0; R_num < 2; R_num++)
         {
           if (flag[R_num] == true) 
           {
-            
+            auto t0 = Time::now();
             AgentBehaviour(C_num,comm);
             calculate_classifier_fitness(C_num, M_num, R_num);
             classifier_initial();
@@ -82,6 +88,10 @@ int main(int argc, char *argv[])
                 return 1;
               }
             }
+            auto t1 = Time::now();
+            fsec fs = t1 - t0;
+            ms d = std::chrono::duration_cast<ms>(fs);
+            std::cout << "time: "<< fs.count() << "s\n";
           }
           else
           {
@@ -95,8 +105,12 @@ int main(int argc, char *argv[])
             
           }     
         }
-        duration = (std::clock() - start) / (double) CLOCKS_PER_SEC;
-        std::cout<<"time: "<<duration<<std::endl;
+        //duration = (std::clock() - start) / (double) CLOCKS_PER_SEC;
+        //auto t1 = Time::now();
+        //fsec fs = t1 - t0;
+        //ms d = std::chrono::duration_cast<ms>(fs);
+        //std::cout << "time: "<< fs.count() << "s\n";
+        //std::cout<<"time: "<<duration<<std::endl;
       }
       
     //std::cout<<M_num<<std::endl;

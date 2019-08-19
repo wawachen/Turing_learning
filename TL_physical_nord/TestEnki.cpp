@@ -10,7 +10,7 @@ double robot_radius = 3.7;
 double world_width = 50;
 double world_height = 50;
 //time
-double ctrl_stepsize = 1;
+double ctrl_stepsize = 0.1;
 //Agent
 Agent::Agent(): EPuck(CAPABILITY_BASIC_SENSORS){}
 
