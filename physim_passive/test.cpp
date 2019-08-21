@@ -183,14 +183,16 @@ std::tuple<double, double,double> AgentBehaviour(const int &C_num,double old_x,d
   TestWorld world(50, 50);
   world.creatAgent(a,old_x,old_y,old_o);
 
+
   for (int Step = 0; Step < maxSteps; Step++)
   {
     world.run();
     CF_input[0] = 2*std::min(agent_get_reading(a)/200.0,1.0)+1; //modified
     CF_input[1] = 1.0;
     CF_elmanNetwork(CF_input, C_num);
-    a->leftSpeed = 2 * maxSpeed * CF_output[1] - maxSpeed;
-    a->rightSpeed = 2 * maxSpeed * CF_output[2] - maxSpeed;
+
+    a->leftSpeed = -6.0;
+    a->rightSpeed = 6.0;
     //Agent_output_information(a,argv);
     //std::cout<<"agent:"<<a->leftSpeed<<" "<<a->rightSpeed<<" "<<CF_output[0]<<std::endl;
   }
@@ -210,8 +212,9 @@ std::tuple<double, double,double> ReplicaBehaviour(const int &C_num, double mode
     CF_input[0] = modelValue[0]*std::min(replica_cal_distance(r)/200.0,1.0)+modelValue[1];
     CF_input[1] = 1.0;
     CF_elmanNetwork(CF_input, C_num);
-    r->leftSpeed = 2 * maxSpeed * CF_output[1] - maxSpeed;
-    r->rightSpeed = 2 * maxSpeed * CF_output[2] - maxSpeed;
+
+    r->leftSpeed = -6.0;
+    r->rightSpeed = 6.0;
     //std::cout<<"model:"<<r->leftSpeed<<" "<<r->rightSpeed<<" "<<CF_output[0]<<std::endl;
     //replica_output_information(r,argv);
   }
