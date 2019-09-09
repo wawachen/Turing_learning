@@ -1,10 +1,10 @@
 # Turing Learning Guidance
 We investigate how an e-puck2 robot can use Turing Learning to infer the response of its laser rangefinder.  
-##before the experiment
+## before the experiment
 You need to download [Enki robot simulator](https://github.com/enki-community/enki), and use *cmake* and *make* operations to compile this folder. Then you can put other experiment folders you want to test into the root folder of **enki** and test them inside the **enki** folder. The makefile of each experiment needs to be changed for correct path.
  
  -----
-##experiment design 
+## experiment design 
 The sim-sim and sim-real experiments are tested.
 For sim-sim experiment, it includes    
 
