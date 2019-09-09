@@ -129,7 +129,7 @@ double agent_get_reading(Agent* a)
 
 void AgentBehaviour(const int &C_num)
 {
-  int motion_num;
+  double d;
   Agent* a = new Agent();
   TestWorld world(50, 50);
   world.creatAgent(a);
@@ -137,38 +137,26 @@ void AgentBehaviour(const int &C_num)
   for (int Step = 0; Step < maxSteps; Step++)
   {
     world.run();
-    CF_input[0] = std::min(agent_get_reading(a)/200.0,1.0);
+    d = 2*agent_get_reading(a)+1;
+    CF_input[0] = 2*std::min(agent_get_reading(a)/200.0,1.0)+1; //modified
     CF_input[1] = 1.0;
     CF_elmanNetwork(CF_input, C_num);
-    
-    motion_num = Step%4;
-    switch(motion_num){
-      case 0:
-        a->leftSpeed = 6.0;
-        a->rightSpeed = 6.0;
-        break;
-      case 1:
-        a->leftSpeed = -6.0;
-        a->rightSpeed = -6.0;
-        break;
-      case 2:
-        a->leftSpeed = 3.0;
-        a->rightSpeed = 3.0;
-        break;
-      case 3:
-        a->leftSpeed = -3.0;
-        a->rightSpeed = -3.0;
-        break;
-
+    if(d<=11.0){
+		  a->leftSpeed =  -8.4;
+      a->rightSpeed = 8.4;
+		}else{
+            a->leftSpeed =  6.4;
+        	  a->rightSpeed = 6.4;
     }
-    
+   
     //std::cout<<"agent:"<<a->leftSpeed<<" "<<a->rightSpeed<<" "<<CF_output[0]<<std::endl;
   }
+  
 }
 
 void ReplicaBehaviour(const int &C_num, double modelValue[2])
 {
-  int motion_num;
+  double d;
   Agent1* r = new Agent1();
   TestWorld world(50, 50);
   world.creatReplica(r);
@@ -176,31 +164,17 @@ void ReplicaBehaviour(const int &C_num, double modelValue[2])
   for (int Step = 0; Step < maxSteps; Step++)
   {
     world.run();
+    d = modelValue[0]*replica_cal_distance(r)+modelValue[1];
     CF_input[0] = modelValue[0]*std::min(replica_cal_distance(r)/200.0,1.0)+modelValue[1];
     CF_input[1] = 1.0;
     CF_elmanNetwork(CF_input, C_num);
-
-    motion_num = Step%4;
-    switch(motion_num){
-      case 0:
-        r->leftSpeed = 6.0;
-        r->rightSpeed = 6.0;
-        break;
-      case 1:
-        r->leftSpeed = -6.0;
-        r->rightSpeed = -6.0;
-        break;
-      case 2:
-        r->leftSpeed = 3.0;
-        r->rightSpeed = 3.0;
-        break;
-      case 3:
-        r->leftSpeed = -3.0;
-        r->rightSpeed = -3.0;
-        break;
-     
+    if(d<=11.0){
+		  r->leftSpeed =  -8.4;
+      r->rightSpeed = 8.4;
+		}else{
+            r->leftSpeed =  6.4;
+        	  r->rightSpeed = 6.4;
     }
-
     //std::cout<<"model:"<<r->leftSpeed<<" "<<r->rightSpeed<<" "<<CF_output[0]<<std::endl;
   }
 }
